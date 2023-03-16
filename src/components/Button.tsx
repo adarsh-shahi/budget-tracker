@@ -22,7 +22,7 @@ const Button = ({
 	if (secondary)
 		finalClasses = "bg-white px-4 py-1 border-2 border-blue-600 rounded-2xl";
 
-	finalClasses = finalClasses + " " + className;
+	finalClasses = finalClasses + " shadow-2xl " + className;
 
 	return (
 		<button onClick={onClick} className={finalClasses}>
