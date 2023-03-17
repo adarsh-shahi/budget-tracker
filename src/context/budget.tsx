@@ -9,10 +9,16 @@ export interface ItemType {
 
 interface stateType {
 	items: ItemType[];
+	budget: number;
+	spent: number;
+	remaining: number;
 }
 
 const initialState: stateType = {
 	items: [],
+	budget: 500,
+	spent: 0,
+	remaining: 500,
 };
 
 interface BudgetContextType {
@@ -25,18 +31,49 @@ const BudgetContext = createContext<BudgetContextType | null>(null);
 export const enum REDUCER_ACTION_TYPE {
 	ADD,
 	DELETE,
+	EDIT_BUDGET,
+}
+
+interface actionPayloadType {
+	item?: ItemType;
+	budget?: number;
 }
 
 interface ReducerAction {
 	type: REDUCER_ACTION_TYPE;
-	payload: ItemType;
+	payload: actionPayloadType;
 }
 
 const reducer = (state: stateType, action: ReducerAction): stateType => {
+	console.log(typeof action);
 	switch (action.type) {
 		case REDUCER_ACTION_TYPE.ADD:
-			return { ...state, items: [...state.items, action.payload] };
-		case REDUCER_ACTION_TYPE.DELETE: // do something and return new state
+			return {
+				...state,
+				items: [...state.items, action.payload?.item!],
+				spent: state.spent + action.payload.item?.price!,
+				remaining: state.remaining - action.payload.item?.price!,
+			};
+
+		case REDUCER_ACTION_TYPE.DELETE:
+			const itemToBeDeleted = state.items.find(
+				(item) => item.id === action.payload.item?.id
+			);
+
+			return {
+				...state,
+				items: state.items.filter(
+					(item) => item.id !== action.payload?.item?.id
+				),
+				remaining: state.remaining + itemToBeDeleted?.price!,
+				spent: state.spent - itemToBeDeleted?.price!,
+			};
+		case REDUCER_ACTION_TYPE.EDIT_BUDGET:
+			return {
+				...state,
+				budget: action.payload.budget!,
+				remaining: action.payload.budget! - state.spent,
+			};
 		default:
 			throw new Error();
 	}

@@ -1,13 +1,28 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import Button from "./Button";
 import { MdClear, MdModeEdit } from "react-icons/md";
 import EditModal from "./EditModal";
+import { BudgetContext, REDUCER_ACTION_TYPE } from "../context/budget";
 
 interface ItemProps {
 	item: { id: number; label: string; price: number };
 }
 const Item = ({ item }: ItemProps) => {
 	const [isEditModal, setIsEditModal] = useState(false);
+	const { dispatch } = useContext(BudgetContext)!;
+
+	const itemDeleteHandler = () => {
+		dispatch({
+			type: REDUCER_ACTION_TYPE.DELETE,
+			payload: {
+				item: {
+					id: item.id,
+					label: item.label,
+					price: item.price,
+				},
+			},
+		});
+	};
 
 	const handleOnEdit = () => {
 		setIsEditModal(true);
@@ -24,7 +39,10 @@ const Item = ({ item }: ItemProps) => {
 				<Button primary className="cursor-default bg-purple-600 font-medium">
 					{item.price}
 				</Button>
-				<MdClear className="rounded-full border-2 border-red-500 text-xl cursor-pointer" />
+				<MdClear
+					onClick={itemDeleteHandler}
+					className="rounded-full border-2 border-red-500 text-xl cursor-pointer"
+				/>
 				<MdModeEdit
 					onClick={handleOnEdit}
 					className="rounded border-2 border-blue-500 text-xl cursor-pointer"
